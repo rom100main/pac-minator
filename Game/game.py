@@ -1,8 +1,8 @@
 import pygame
 import sys
-import math
 from maze import Maze
 from ghost import Ghost
+from player import Player
 
 class PacmanGame:
     def __init__(self):
@@ -25,16 +25,8 @@ class PacmanGame:
         # Initialize maze
         self.maze = Maze(self.width, self.height)
         
-        # Pacman initial position (aligned with maze grid)
-        self.pacman_x = 60  # One cell + half a cell (40 + 20)
-        self.pacman_y = 60  # One cell + half a cell (40 + 20)
-        self.pacman_radius = 15  # Slightly smaller to fit maze better
-        self.pacman_angle = 0
-        self.pacman_speed = 4
-        self.mouth_angle = 45  # Angle for pacman's mouth
-        
-        # Score and game state
-        self.score = 0
+        # Initialize player and game state
+        self.player = Player()
         self.font = pygame.font.Font(None, 36)
         self.game_over = False
         
@@ -53,70 +45,33 @@ class PacmanGame:
 
     def update(self):
         if not self.game_over:
-            # Store current position
-            new_x = self.pacman_x
-            new_y = self.pacman_y
-            
-            # Update position based on input
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_LEFT]:
-                new_x -= self.pacman_speed
-                self.pacman_angle = 180
-            if keys[pygame.K_RIGHT]:
-                new_x += self.pacman_speed
-                self.pacman_angle = 0
-            if keys[pygame.K_UP]:
-                new_y -= self.pacman_speed
-                self.pacman_angle = 90
-            if keys[pygame.K_DOWN]:
-                new_y += self.pacman_speed
-                self.pacman_angle = 270
-                
-            # Check for wall collision before updating position
-            if not self.maze.check_collision(new_x, new_y, self.pacman_radius):
-                self.pacman_x = new_x
-                self.pacman_y = new_y
-                
-            # Check for dot collision
-            if self.maze.eat_dot(self.pacman_x, self.pacman_y):
-                self.score += 10
+            # Update player
+            self.player.move(self.maze)
             
             # Update ghosts
             for ghost in self.ghosts:
-                ghost.update(self.maze, self.pacman_x, self.pacman_y)
-                if ghost.collides_with_pacman(self.pacman_x, self.pacman_y, self.pacman_radius):
+                ghost.update(self.maze, self.player.x, self.player.y)
+                if ghost.collides_with_pacman(self.player.x, self.player.y, self.player.radius):
                     self.game_over = True
                     
             # Check win condition
             if len(self.maze.dots) == 0:
                 self.game_over = True
 
-    def draw_pacman(self):
-        # Draw Pacman as a circle with a mouth
-        start_angle = self.pacman_angle + self.mouth_angle
-        end_angle = self.pacman_angle - self.mouth_angle
-        pygame.draw.arc(self.screen, self.YELLOW,
-                       (self.pacman_x - self.pacman_radius,
-                        self.pacman_y - self.pacman_radius,
-                        self.pacman_radius * 2,
-                        self.pacman_radius * 2),
-                       math.radians(start_angle),
-                       math.radians(end_angle), self.pacman_radius)
-
     def draw(self):
         self.screen.fill(self.BLACK)
         self.maze.draw(self.screen)
         
-        # Draw ghosts behind Pacman
+        # Draw ghosts
         for ghost in self.ghosts:
             ghost.draw(self.screen)
             
-        # Only draw Pacman if game is not over
+        # Draw player if game is not over
         if not self.game_over:
-            self.draw_pacman()
+            self.player.draw(self.screen)
         
         # Draw score
-        score_text = self.font.render(f'Score: {self.score}', True, self.YELLOW)
+        score_text = self.font.render(f'Score: {self.player.score}', True, self.YELLOW)
         self.screen.blit(score_text, (10, 10))
         
         # Draw game over or win message
@@ -138,10 +93,7 @@ class PacmanGame:
         pygame.display.flip()
 
     def reset_game(self):
-        self.pacman_x = 60
-        self.pacman_y = 60
-        self.pacman_angle = 0
-        self.score = 0
+        self.player.reset()
         self.game_over = False
         self.maze = Maze(self.width, self.height)
         self.ghosts = [
