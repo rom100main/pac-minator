@@ -9,7 +9,7 @@ DIRECTIONS = {
 }
 
 class Player:
-    def __init__(self, x=60, y=60):
+    def __init__(self, x=40, y=40):
         self.x = x 
         self.y = y
         self.radius = 15
@@ -56,14 +56,18 @@ class Player:
             self.score += 10
 
     def draw(self, screen):
+        # Offset position by half cell size (20 pixels) for display
+        display_x = self.x + 20
+        display_y = self.y + 20
+        
         start_angle = self.angle + self.mouth_angle
         end_angle = self.angle - self.mouth_angle
         pygame.draw.arc(
             screen, 
             self.color,
             (
-                self.x - self.radius,
-                self.y - self.radius,
+                display_x - self.radius,
+                display_y - self.radius,
                 self.radius * 2,
                 self.radius * 2
             ),
@@ -72,7 +76,7 @@ class Player:
             self.radius
         )
 
-    def reset(self, x=60, y=60):
+    def reset(self, x=40, y=40):
         self.x = x
         self.y = y
         self.angle = 0

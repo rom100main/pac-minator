@@ -80,8 +80,8 @@ class Maze:
 
     def check_collision(self, x, y, direction):
         # Convert position to grid coordinates
-        grid_x = int(x // self.cell_size)
-        grid_y = int(y // self.cell_size)
+        grid_x = round(x / self.cell_size)
+        grid_y = round(y / self.cell_size)
         
         # Get the next cell position based on direction
         next_x = grid_x + direction[0]
@@ -95,6 +95,9 @@ class Maze:
         return True  # Collide with boundaries
 
     def eat_dot(self, x, y):
+        # Adjust x,y by half cell size to match display coordinates
+        x = x + self.cell_size/2
+        y = y + self.cell_size/2
         collision_radius = (self.dot_radius + 15)**2  # Square of combined radii (dot + pacman)
         for i, dot in enumerate(self.dots):
             if ((x - dot[0])**2 + (y - dot[1])**2) <= collision_radius:

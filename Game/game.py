@@ -31,12 +31,15 @@ class PacmanGame:
         self.game_over = False
         
         # Initialize ghosts (positions aligned with maze grid)
+        self.ghosts = []
+        """
         self.ghosts = [
-            Ghost(380, 380, self.RED),     # Center
-            Ghost(340, 380, self.PINK),    # Left of center
-            Ghost(420, 380, self.CYAN),    # Right of center
-            Ghost(380, 340, self.ORANGE),  # Above center
+            Ghost(360, 360, self.RED),     # Center
+            Ghost(320, 360, self.PINK),    # Left of center
+            Ghost(400, 360, self.CYAN),    # Right of center
+            Ghost(360, 320, self.ORANGE),  # Above center
         ]
+        """
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -97,10 +100,10 @@ class PacmanGame:
         self.game_over = False
         self.maze = Maze(self.width, self.height)
         self.ghosts = [
-            Ghost(380, 380, self.RED),
-            Ghost(340, 380, self.PINK),
-            Ghost(420, 380, self.CYAN),
-            Ghost(380, 340, self.ORANGE),
+            Ghost(360, 360, self.RED),
+            Ghost(320, 360, self.PINK),
+            Ghost(400, 360, self.CYAN),
+            Ghost(360, 320, self.ORANGE),
         ]
 
     def handle_events(self):

@@ -72,16 +72,20 @@ class Ghost:
                 self.direction = random.choice(valid_directions)
                 
     def draw(self, screen):
+        # Offset position by half cell size (20 pixels) for display
+        display_x = self.x + 20
+        display_y = self.y + 20
+        
         # Body
-        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
+        pygame.draw.circle(screen, self.color, (int(display_x), int(display_y)), self.radius)
         
         # "skirt"
         points = [
-            (self.x - self.radius, self.y + self.radius),
-            (self.x - self.radius/2, self.y + self.radius/2),
-            (self.x, self.y + self.radius),
-            (self.x + self.radius/2, self.y + self.radius/2),
-            (self.x + self.radius, self.y + self.radius)
+            (display_x - self.radius, display_y + self.radius),
+            (display_x - self.radius/2, display_y + self.radius/2),
+            (display_x, display_y + self.radius),
+            (display_x + self.radius/2, display_y + self.radius/2),
+            (display_x + self.radius, display_y + self.radius)
         ]
         pygame.draw.lines(screen, self.color, False, points, 3)
         
@@ -95,8 +99,8 @@ class Ghost:
             screen, 
             eye_color,
             (
-                int(self.x - eye_offset_x), 
-                int(self.y + eye_offset_y)
+                int(display_x - eye_offset_x), 
+                int(display_y + eye_offset_y)
             ),
             eye_radius
         )
@@ -104,14 +108,14 @@ class Ghost:
             screen, 
             eye_color,
             (
-                int(self.x + eye_offset_x), 
-                int(self.y + eye_offset_y)
+                int(display_x + eye_offset_x), 
+                int(display_y + eye_offset_y)
             ),
             eye_radius
         )
         
     def collides_with_pacman(self, pacman_x, pacman_y, pacman_radius):
-        # Calculate distance between ghost and pacman
+        # No need to adjust for display offset since both ghost and pacman 
+        # use the same coordinate system internally
         distance = math.sqrt((self.x - pacman_x)**2 + (self.y - pacman_y)**2)
-        # Return True if they overlap
         return distance < (self.radius + pacman_radius)
