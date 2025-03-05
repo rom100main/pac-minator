@@ -12,7 +12,10 @@ class Maze:
         self.BLUE = (0, 0, 255)
         self.WHITE = (255, 255, 255)
         
-        # Create the maze layout (1 for walls, 0 for paths, 2 for dots)
+        # Maze
+        # 1 for walls, 
+        # 0 for paths, 
+        # 2 for dots
         self.layout = [
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1],
@@ -48,23 +51,34 @@ class Maze:
                     self.dots.append((x, y))
 
     def draw(self, screen):
-        # Draw walls
+        # Walls
         for row in range(len(self.layout)):
             for col in range(len(self.layout[0])):
                 if self.layout[row][col] == 1:
-                    pygame.draw.rect(screen, self.BLUE, 
-                                  (col * self.cell_size, 
-                                   row * self.cell_size, 
-                                   self.cell_size, 
-                                   self.cell_size))
+                    pygame.draw.rect(
+                        screen, 
+                        self.BLUE, 
+                        (
+                            col * self.cell_size, 
+                            row * self.cell_size, 
+                            self.cell_size, 
+                            self.cell_size
+                        )
+                    )
 
-        # Draw dots
+        # Dots
         for dot in self.dots:
-            pygame.draw.circle(screen, self.WHITE, 
-                             (int(dot[0]), int(dot[1])), self.dot_radius)
+            pygame.draw.circle(
+                screen, 
+                self.WHITE, 
+                (
+                    int(dot[0]), 
+                    int(dot[1])
+                ), 
+                self.dot_radius
+            )
 
     def check_collision(self, x, y, radius):
-        # Get grid position
         grid_x = x // self.cell_size
         grid_y = y // self.cell_size
         
@@ -74,14 +88,18 @@ class Maze:
                 check_x = grid_x + dx
                 check_y = grid_y + dy
                 
-                if (0 <= check_y < len(self.layout) and 
+                if (
+                    0 <= check_y < len(self.layout) and 
                     0 <= check_x < len(self.layout[0]) and 
-                    self.layout[check_y][check_x] == 1):
+                    self.layout[check_y][check_x] == 1
+                ):
                     # Check collision with wall
-                    wall_rect = pygame.Rect(check_x * self.cell_size, 
-                                         check_y * self.cell_size,
-                                         self.cell_size, 
-                                         self.cell_size)
+                    wall_rect = pygame.Rect(
+                        check_x * self.cell_size, 
+                        check_y * self.cell_size,
+                        self.cell_size, 
+                        self.cell_size
+                    )
                     circle_dist_x = abs(x - wall_rect.centerx)
                     circle_dist_y = abs(y - wall_rect.centery)
                     
@@ -91,8 +109,10 @@ class Maze:
                     if circle_dist_x <= wall_rect.width/2: return True
                     if circle_dist_y <= wall_rect.height/2: return True
                     
-                    corner_dist_sq = ((circle_dist_x - wall_rect.width/2) ** 2 +
-                                    (circle_dist_y - wall_rect.height/2) ** 2)
+                    corner_dist_sq = (
+                        (circle_dist_x - wall_rect.width/2) ** 2 +
+                        (circle_dist_y - wall_rect.height/2) ** 2
+                    )
                     
                     if corner_dist_sq <= (radius ** 2):
                         return True

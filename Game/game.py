@@ -45,16 +45,16 @@ class PacmanGame:
 
     def update(self):
         if not self.game_over:
-            # Update player
+            # Player
             self.player.move(self.maze)
             
-            # Update ghosts
+            # Ghosts
             for ghost in self.ghosts:
                 ghost.update(self.maze, self.player.x, self.player.y)
                 if ghost.collides_with_pacman(self.player.x, self.player.y, self.player.radius):
                     self.game_over = True
                     
-            # Check win condition
+            # Check win
             if len(self.maze.dots) == 0:
                 self.game_over = True
 
@@ -62,19 +62,19 @@ class PacmanGame:
         self.screen.fill(self.BLACK)
         self.maze.draw(self.screen)
         
-        # Draw ghosts
+        # Ghosts
         for ghost in self.ghosts:
             ghost.draw(self.screen)
             
-        # Draw player if game is not over
+        # Player if not over
         if not self.game_over:
             self.player.draw(self.screen)
         
-        # Draw score
+        # Score
         score_text = self.font.render(f'Score: {self.player.score}', True, self.YELLOW)
         self.screen.blit(score_text, (10, 10))
         
-        # Draw game over or win message
+        # Game over or win message
         if self.game_over:
             if len(self.maze.dots) == 0:
                 message = "YOU WIN!"
@@ -85,7 +85,7 @@ class PacmanGame:
             text_rect = game_over_text.get_rect(center=(self.width//2, self.height//2))
             self.screen.blit(game_over_text, text_rect)
             
-            # Draw restart instruction
+            # Restart instruction
             restart_text = self.font.render("Press SPACE to restart", True, self.YELLOW)
             restart_rect = restart_text.get_rect(center=(self.width//2, self.height//2 + 40))
             self.screen.blit(restart_text, restart_rect)

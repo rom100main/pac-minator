@@ -11,25 +11,26 @@ class Ghost:
         self.speed = 3
         self.direction = random.choice([(0, 1), (0, -1), (1, 0), (-1, 0)])
         self.target_time = 0
-        self.direction_change_interval = 2000  # Change direction every 2 seconds
+        self.direction_change_interval = 2000  # change direction every 2 seconds
         
     def update(self, maze, pacman_x, pacman_y):
         current_time = pygame.time.get_ticks()
         
-        # Change direction periodically or when hitting a wall
-        if (current_time - self.target_time > self.direction_change_interval or 
-            maze.check_collision(self.x + self.direction[0] * self.speed,
-                               self.y + self.direction[1] * self.speed,
-                               self.radius)):
-            
+        # change direction periodically or when hitting a wall
+        if (
+            current_time - self.target_time > self.direction_change_interval or 
+            maze.check_collision(
+                self.x + self.direction[0] * self.speed,
+                self.y + self.direction[1] * self.speed,
+                self.radius
+            )
+        ):    
             self.choose_direction(maze, pacman_x, pacman_y)
             self.target_time = current_time
             
-        # Update position
         new_x = self.x + self.direction[0] * self.speed
         new_y = self.y + self.direction[1] * self.speed
         
-        # Only move if not colliding with wall
         if not maze.check_collision(new_x, new_y, self.radius):
             self.x = new_x
             self.y = new_y
@@ -39,7 +40,7 @@ class Ghost:
         possible_directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
         valid_directions = []
         
-        # Check which directions are valid (don't hit walls)
+        # Check valid directions (don't hit walls)
         for dx, dy in possible_directions:
             # Look ahead further to avoid getting stuck
             test_x = self.x + dx * (self.radius + 10)
@@ -49,8 +50,10 @@ class Ghost:
             diag_x = self.x + dx * self.radius
             diag_y = self.y + dy * self.radius
             
-            if (not maze.check_collision(test_x, test_y, self.radius) and 
-                not maze.check_collision(diag_x, diag_y, self.radius)):
+            if (
+                not maze.check_collision(test_x, test_y, self.radius) and 
+                not maze.check_collision(diag_x, diag_y, self.radius)
+            ):
                 valid_directions.append((dx, dy))
                 
         if valid_directions:
@@ -82,10 +85,10 @@ class Ghost:
                 self.direction = random.choice(valid_directions)
                 
     def draw(self, screen):
-        # Draw ghost body
+        # Body
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
         
-        # Draw ghost "skirt"
+        # "skirt"
         points = [
             (self.x - self.radius, self.y + self.radius),
             (self.x - self.radius/2, self.y + self.radius/2),
@@ -95,20 +98,30 @@ class Ghost:
         ]
         pygame.draw.lines(screen, self.color, False, points, 3)
         
-        # Draw eyes
+        # Eyes
         eye_color = (255, 255, 255)  # White
         eye_radius = 4
         eye_offset_x = 6
         eye_offset_y = -2
-        
-        # Left eye
-        pygame.draw.circle(screen, eye_color,
-                         (int(self.x - eye_offset_x), int(self.y + eye_offset_y)),
-                         eye_radius)
-        # Right eye
-        pygame.draw.circle(screen, eye_color,
-                         (int(self.x + eye_offset_x), int(self.y + eye_offset_y)),
-                         eye_radius)
+
+        pygame.draw.circle(
+            screen, 
+            eye_color,
+            (
+                int(self.x - eye_offset_x), 
+                int(self.y + eye_offset_y)
+            ),
+            eye_radius
+        )
+        pygame.draw.circle(
+            screen, 
+            eye_color,
+            (
+                int(self.x + eye_offset_x), 
+                int(self.y + eye_offset_y)
+            ),
+            eye_radius
+        )
         
     def collides_with_pacman(self, pacman_x, pacman_y, pacman_radius):
         # Calculate distance between ghost and pacman
