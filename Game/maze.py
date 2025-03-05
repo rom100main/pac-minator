@@ -1,5 +1,12 @@
 import pygame
 
+DIRECTIONS = {
+    "UP": (0, -1), 
+    "RIGHT": (1, 0), 
+    "DOWN": (0, 1),
+    "LEFT": (-1, 0),
+}
+
 class Maze:
     def __init__(self, width, height):
         self.cell_size = 40
@@ -84,15 +91,19 @@ class Maze:
         grid_y = round(y / self.cell_size)
         
         # Get the next cell position based on direction
-        next_x = grid_x + direction[0]
-        next_y = grid_y + direction[1]
+        next_x = (grid_x + direction[0])*self.cell_size
+        next_y = (grid_y + direction[1])*self.cell_size
         
-        # Check if next position is within bounds and is a wall
-        if (0 <= next_y < len(self.layout) and 
-            0 <= next_x < len(self.layout[0])):
-            return self.layout[next_y][next_x] == 1
+        if direction == DIRECTIONS["UP"] and self.layout[grid_y-1][grid_x] == 1:
+            return y < next_y + self.cell_size
+        if direction == DIRECTIONS["DOWN"] and self.layout[grid_y+1][grid_x] == 1:
+            return y > next_y - self.cell_size
+        if direction == DIRECTIONS["LEFT"] and self.layout[grid_y][grid_x-1] == 1:
+            return x < next_x + self.cell_size
+        if direction == DIRECTIONS["RIGHT"] and self.layout[grid_y][grid_x+1] == 1:
+            return x > next_x - self.cell_size
             
-        return True  # Collide with boundaries
+        return False
 
     def eat_dot(self, x, y):
         # Adjust x,y by half cell size to match display coordinates
