@@ -78,45 +78,21 @@ class Maze:
                 self.dot_radius
             )
 
-    def check_collision(self, x, y, radius):
-        grid_x = x // self.cell_size
-        grid_y = y // self.cell_size
+    def check_collision(self, x, y, direction):
+        # Convert position to grid coordinates
+        grid_x = int(x // self.cell_size)
+        grid_y = int(y // self.cell_size)
         
-        # Check surrounding cells
-        for dy in [-1, 0, 1]:
-            for dx in [-1, 0, 1]:
-                check_x = grid_x + dx
-                check_y = grid_y + dy
-                
-                if (
-                    0 <= check_y < len(self.layout) and 
-                    0 <= check_x < len(self.layout[0]) and 
-                    self.layout[check_y][check_x] == 1
-                ):
-                    # Check collision with wall
-                    wall_rect = pygame.Rect(
-                        check_x * self.cell_size, 
-                        check_y * self.cell_size,
-                        self.cell_size, 
-                        self.cell_size
-                    )
-                    circle_dist_x = abs(x - wall_rect.centerx)
-                    circle_dist_y = abs(y - wall_rect.centery)
-                    
-                    if circle_dist_x > (wall_rect.width/2 + radius): continue
-                    if circle_dist_y > (wall_rect.height/2 + radius): continue
-                    
-                    if circle_dist_x <= wall_rect.width/2: return True
-                    if circle_dist_y <= wall_rect.height/2: return True
-                    
-                    corner_dist_sq = (
-                        (circle_dist_x - wall_rect.width/2) ** 2 +
-                        (circle_dist_y - wall_rect.height/2) ** 2
-                    )
-                    
-                    if corner_dist_sq <= (radius ** 2):
-                        return True
-        return False
+        # Get the next cell position based on direction
+        next_x = grid_x + direction[0]
+        next_y = grid_y + direction[1]
+        
+        # Check if next position is within bounds and is a wall
+        if (0 <= next_y < len(self.layout) and 
+            0 <= next_x < len(self.layout[0])):
+            return self.layout[next_y][next_x] == 1
+            
+        return True  # Collide with boundaries
 
     def eat_dot(self, x, y):
         collision_radius = (self.dot_radius + 15)**2  # Square of combined radii (dot + pacman)

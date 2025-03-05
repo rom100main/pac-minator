@@ -19,11 +19,7 @@ class Ghost:
         # change direction periodically or when hitting a wall
         if (
             current_time - self.target_time > self.direction_change_interval or 
-            maze.check_collision(
-                self.x + self.direction[0] * self.speed,
-                self.y + self.direction[1] * self.speed,
-                self.radius
-            )
+            maze.check_collision(self.x, self.y, self.direction)
         ):    
             self.choose_direction(maze, pacman_x, pacman_y)
             self.target_time = current_time
@@ -31,7 +27,7 @@ class Ghost:
         new_x = self.x + self.direction[0] * self.speed
         new_y = self.y + self.direction[1] * self.speed
         
-        if not maze.check_collision(new_x, new_y, self.radius):
+        if not maze.check_collision(self.x, self.y, self.direction):
             self.x = new_x
             self.y = new_y
             
@@ -43,17 +39,8 @@ class Ghost:
         # Check valid directions (don't hit walls)
         for dx, dy in possible_directions:
             # Look ahead further to avoid getting stuck
-            test_x = self.x + dx * (self.radius + 10)
-            test_y = self.y + dy * (self.radius + 10)
-            
-            # Additional diagonal check to avoid corners
-            diag_x = self.x + dx * self.radius
-            diag_y = self.y + dy * self.radius
-            
-            if (
-                not maze.check_collision(test_x, test_y, self.radius) and 
-                not maze.check_collision(diag_x, diag_y, self.radius)
-            ):
+            # Test if direction is valid
+            if not maze.check_collision(self.x, self.y, (dx, dy)):
                 valid_directions.append((dx, dy))
                 
         if valid_directions:

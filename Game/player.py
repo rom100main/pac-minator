@@ -48,7 +48,7 @@ class Player:
             self.angle = 270
 
 
-        if not maze.check_collision(new_x, new_y, self.radius):
+        if not maze.check_collision(self.x, self.y, self.direction):
             self.x = new_x
             self.y = new_y
         
