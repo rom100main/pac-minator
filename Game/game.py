@@ -25,9 +25,9 @@ class PacmanGame:
         # Initialize maze
         self.maze = Maze(self.width, self.height)
         
-        # Pacman initial position (adjusted for maze)
-        self.pacman_x = 400
-        self.pacman_y = 560
+        # Pacman initial position (aligned with maze grid)
+        self.pacman_x = 60  # One cell + half a cell (40 + 20)
+        self.pacman_y = 60  # One cell + half a cell (40 + 20)
         self.pacman_radius = 15  # Slightly smaller to fit maze better
         self.pacman_angle = 0
         self.pacman_speed = 4
@@ -38,12 +38,12 @@ class PacmanGame:
         self.font = pygame.font.Font(None, 36)
         self.game_over = False
         
-        # Initialize ghosts
+        # Initialize ghosts (positions aligned with maze grid)
         self.ghosts = [
-            Ghost(400, 360, self.RED),     # Center
-            Ghost(360, 360, self.PINK),    # Left of center
-            Ghost(440, 360, self.CYAN),    # Right of center
-            Ghost(400, 320, self.ORANGE),  # Above center
+            Ghost(380, 380, self.RED),     # Center
+            Ghost(340, 380, self.PINK),    # Left of center
+            Ghost(420, 380, self.CYAN),    # Right of center
+            Ghost(380, 340, self.ORANGE),  # Above center
         ]
 
     def handle_events(self):
@@ -138,17 +138,17 @@ class PacmanGame:
         pygame.display.flip()
 
     def reset_game(self):
-        self.pacman_x = 400
-        self.pacman_y = 560
+        self.pacman_x = 60
+        self.pacman_y = 60
         self.pacman_angle = 0
         self.score = 0
         self.game_over = False
         self.maze = Maze(self.width, self.height)
         self.ghosts = [
-            Ghost(400, 360, self.RED),
-            Ghost(360, 360, self.PINK),
-            Ghost(440, 360, self.CYAN),
-            Ghost(400, 320, self.ORANGE),
+            Ghost(380, 380, self.RED),
+            Ghost(340, 380, self.PINK),
+            Ghost(420, 380, self.CYAN),
+            Ghost(380, 340, self.ORANGE),
         ]
 
     def handle_events(self):

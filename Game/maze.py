@@ -60,7 +60,8 @@ class Maze:
 
         # Draw dots
         for dot in self.dots:
-            pygame.draw.circle(screen, self.WHITE, dot, self.dot_radius)
+            pygame.draw.circle(screen, self.WHITE, 
+                             (int(dot[0]), int(dot[1])), self.dot_radius)
 
     def check_collision(self, x, y, radius):
         # Get grid position
@@ -98,8 +99,9 @@ class Maze:
         return False
 
     def eat_dot(self, x, y):
+        collision_radius = (self.dot_radius + 15)**2  # Square of combined radii (dot + pacman)
         for i, dot in enumerate(self.dots):
-            if ((x - dot[0])**2 + (y - dot[1])**2) <= (20**2):  # Collision radius
+            if ((x - dot[0])**2 + (y - dot[1])**2) <= collision_radius:
                 self.dots.pop(i)
                 return True
         return False

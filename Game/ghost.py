@@ -8,7 +8,7 @@ class Ghost:
         self.y = y
         self.color = color
         self.radius = 15
-        self.speed = 2
+        self.speed = 3
         self.direction = random.choice([(0, 1), (0, -1), (1, 0), (-1, 0)])
         self.target_time = 0
         self.direction_change_interval = 2000  # Change direction every 2 seconds
@@ -41,9 +41,16 @@ class Ghost:
         
         # Check which directions are valid (don't hit walls)
         for dx, dy in possible_directions:
-            test_x = self.x + dx * (self.radius + 5)  # Look ahead a bit
-            test_y = self.y + dy * (self.radius + 5)
-            if not maze.check_collision(test_x, test_y, self.radius):
+            # Look ahead further to avoid getting stuck
+            test_x = self.x + dx * (self.radius + 10)
+            test_y = self.y + dy * (self.radius + 10)
+            
+            # Additional diagonal check to avoid corners
+            diag_x = self.x + dx * self.radius
+            diag_y = self.y + dy * self.radius
+            
+            if (not maze.check_collision(test_x, test_y, self.radius) and 
+                not maze.check_collision(diag_x, diag_y, self.radius)):
                 valid_directions.append((dx, dy))
                 
         if valid_directions:
