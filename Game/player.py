@@ -1,6 +1,13 @@
 import pygame
 import math
 
+DIRECTIONS = {
+    "UP": (0, -1), 
+    "RIGHT": (1, 0), 
+    "DOWN": (0, 1),
+    "LEFT": (-1, 0),
+}
+
 class Player:
     def __init__(self, x=60, y=60):
         self.x = x 
@@ -11,6 +18,7 @@ class Player:
         self.mouth_angle = 45
         self.score = 0
         self.color = (255, 255, 0) # YELLOW
+        self.direction = DIRECTIONS["RIGHT"] 
 
     def move(self, maze):
         new_x = self.x
@@ -18,17 +26,27 @@ class Player:
         
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
+            self.direction = DIRECTIONS["LEFT"]
+        if keys[pygame.K_RIGHT]:
+            self.direction = DIRECTIONS["RIGHT"]
+        if keys[pygame.K_UP]:
+            self.direction = DIRECTIONS["UP"]
+        if keys[pygame.K_DOWN]:
+            self.direction = DIRECTIONS["DOWN"]
+        
+        if self.direction == DIRECTIONS["LEFT"]:
             new_x -= self.speed
             self.angle = 180
-        if keys[pygame.K_RIGHT]:
+        if self.direction == DIRECTIONS["RIGHT"]:
             new_x += self.speed
             self.angle = 0
-        if keys[pygame.K_UP]:
+        if self.direction == DIRECTIONS["UP"]:
             new_y -= self.speed
             self.angle = 90
-        if keys[pygame.K_DOWN]:
+        if self.direction == DIRECTIONS["DOWN"]:
             new_y += self.speed
             self.angle = 270
+
 
         if not maze.check_collision(new_x, new_y, self.radius):
             self.x = new_x
