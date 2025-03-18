@@ -88,6 +88,11 @@ class Ghost:
             return self.eaten_color
         return self.base_color
     
+    def can_move_forward(self, maze):
+        # Check one tile ahead
+        next_tile_pos = self.position + self.direction * maze.tile_size
+        return not maze.is_wall(next_tile_pos.x, next_tile_pos.y)
+
     def update(self, maze, player):
         if self.state == GhostState.FRIGHTENED:
             self.frightened_timer -= 1
@@ -96,13 +101,14 @@ class Ghost:
         
         # Update direction at tile centers
         if self.is_at_center(maze):
-            self.direction = self.choose_direction(maze, player)
+            if not self.can_move_forward(maze):
+                self.direction = self.choose_direction(maze, player)
             # Snap to grid when turning
             center_x, center_y = maze.get_tile_center(self.position.x, self.position.y)
             self.position.x = center_x
             self.position.y = center_y
         
-        # Move in current direction
+        # Move in current direction if possible
         if self.direction:
             new_pos = self.position + self.direction * self.speed
             if not maze.is_wall(new_pos.x, new_pos.y):

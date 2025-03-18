@@ -29,7 +29,6 @@ class Player:
     def can_turn(self, direction, maze):
         # Check if we can move in the given direction from current position
         test_pos = self.position + direction * self.radius
-        #print(test_pos, self.position)
         return not maze.is_wall(test_pos.x, test_pos.y)
     
     def is_at_center(self, maze):
@@ -37,6 +36,11 @@ class Player:
         return (abs(self.position.x - center_x) < self.speed and 
                 abs(self.position.y - center_y) < self.speed)
     
+    def can_move_forward(self, maze):
+        # Check one tile ahead
+        next_tile_pos = self.position + self.direction * maze.tile_size
+        return not maze.is_wall(next_tile_pos.x, next_tile_pos.y)
+
     def update(self, maze):
         # Try to turn if at tile center
         if self.next_direction and self.is_at_center(maze):
@@ -47,11 +51,18 @@ class Player:
                 self.position.x = center_x
                 self.position.y = center_y
         
-        # Continue moving in current direction if possible
+        # Check if we can continue moving in current direction
         if self.direction:
-            new_pos = self.position + self.direction * self.speed
-            if not maze.is_wall(new_pos.x, new_pos.y):
-                self.position = new_pos
+            if not self.can_move_forward(maze) and self.is_at_center(maze):
+                # Stop at center if we can't move forward
+                center_x, center_y = maze.get_tile_center(self.position.x, self.position.y)
+                self.position.x = center_x
+                self.position.y = center_y
+            else:
+                # Continue moving if possible
+                new_pos = self.position + self.direction * self.speed
+                if not maze.is_wall(new_pos.x, new_pos.y):
+                    self.position = new_pos
         
         # Update mouth animation
         self.animation_timer += self.animation_speed
