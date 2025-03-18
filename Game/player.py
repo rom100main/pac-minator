@@ -7,7 +7,6 @@ class Player:
         self.position = Vector2(x, y)
         self.direction = Vector2(0, 0)
         self.next_direction = Vector2(0, 0)
-        self.stored_direction = None
         self.speed = 2
         self.radius = 13
         self.color = (255, 255, 0)  # Yellow
@@ -19,17 +18,18 @@ class Player:
     def handle_input(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                self.stored_direction = Vector2(-1, 0)
+                self.next_direction = Vector2(-1, 0)
             elif event.key == pygame.K_RIGHT:
-                self.stored_direction = Vector2(1, 0)
+                self.next_direction = Vector2(1, 0)
             elif event.key == pygame.K_UP:
-                self.stored_direction = Vector2(0, -1)
+                self.next_direction = Vector2(0, -1)
             elif event.key == pygame.K_DOWN:
-                self.stored_direction = Vector2(0, 1)
+                self.next_direction = Vector2(0, 1)
     
     def can_turn(self, direction, maze):
         # Check if we can move in the given direction from current position
         test_pos = self.position + direction * self.radius
+        #print(test_pos, self.position)
         return not maze.is_wall(test_pos.x, test_pos.y)
     
     def is_at_center(self, maze):
@@ -43,18 +43,8 @@ class Player:
         return not maze.is_wall(next_tile_pos.x, next_tile_pos.y)
 
     def update(self, maze):
-        # Try to execute stored direction first if we're at a tile center
-        if self.stored_direction and self.is_at_center(maze):
-            if self.can_turn(self.stored_direction, maze):
-                self.direction = self.stored_direction
-                self.next_direction = self.stored_direction
-                self.stored_direction = None
-                # Snap to grid when turning
-                center_x, center_y = maze.get_tile_center(self.position.x, self.position.y)
-                self.position.x = center_x
-                self.position.y = center_y
-        # Try to turn if at tile center and no stored direction was executed
-        elif self.next_direction and self.is_at_center(maze):
+        # Try to turn if at tile center
+        if self.next_direction and self.is_at_center(maze):
             if self.can_turn(self.next_direction, maze):
                 self.direction = self.next_direction
                 # Snap to grid when turning
