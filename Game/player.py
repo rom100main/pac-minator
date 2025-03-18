@@ -26,41 +26,37 @@ class Player:
             elif event.key == pygame.K_DOWN:
                 self.next_direction = Vector2(0, 1)
     
-    def can_turn(self, direction, maze):
+    def can_move_in_direction(self, direction, maze):
         # Check if we can move in the given direction from current position
-        test_pos = self.position + direction * self.radius
-        #print(test_pos, self.position)
-        return not maze.is_wall(test_pos.x, test_pos.y)
+        next_tile_pos = self.position + direction * maze.tile_size
+        return not maze.is_wall(next_tile_pos.x, next_tile_pos.y)
     
     def is_at_center(self, maze):
         center_x, center_y = maze.get_tile_center(self.position.x, self.position.y)
         return (abs(self.position.x - center_x) < self.speed and 
                 abs(self.position.y - center_y) < self.speed)
-    
-    def can_move_forward(self, maze):
-        # Check one tile ahead
-        next_tile_pos = self.position + self.direction * maze.tile_size
-        return not maze.is_wall(next_tile_pos.x, next_tile_pos.y)
 
     def update(self, maze):
-        # Try to turn if at tile center
+        # Try to execute stored turn if at tile center
         if self.next_direction and self.is_at_center(maze):
-            if self.can_turn(self.next_direction, maze):
+            # Check if we can move in the stored direction
+            if self.can_move_in_direction(self.next_direction, maze):
                 self.direction = self.next_direction
                 # Snap to grid when turning
                 center_x, center_y = maze.get_tile_center(self.position.x, self.position.y)
                 self.position.x = center_x
                 self.position.y = center_y
+                self.next_direction = Vector2(0, 0)  # Clear the stored direction after executing
         
-        # Check if we can continue moving in current direction
+        # Continue moving in current direction if possible
         if self.direction:
-            if not self.can_move_forward(maze) and self.is_at_center(maze):
+            if not self.can_move_in_direction(self.direction, maze) and self.is_at_center(maze):
                 # Stop at center if we can't move forward
                 center_x, center_y = maze.get_tile_center(self.position.x, self.position.y)
                 self.position.x = center_x
                 self.position.y = center_y
             else:
-                # Continue moving if possible
+                # Continue moving
                 new_pos = self.position + self.direction * self.speed
                 if not maze.is_wall(new_pos.x, new_pos.y):
                     self.position = new_pos
