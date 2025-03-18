@@ -18,21 +18,33 @@ class Player:
         self.mouth_angle = 45
         self.score = 0
         self.color = (255, 255, 0) # YELLOW
-        self.direction = DIRECTIONS["RIGHT"] 
+        self.direction = DIRECTIONS["RIGHT"]
+        self.next_direction = DIRECTIONS["RIGHT"]
+
+    def is_centered(self):
+        # Check if player is centered on a tile (x and y are multiples of 40)
+        return abs(self.x % 40) < 40 and abs(self.y % 40) < 40
 
     def move(self, maze):
-        new_x = self.x
-        new_y = self.y
-        
+        # Store next direction based on key press
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-            self.direction = DIRECTIONS["LEFT"]
+            self.next_direction = DIRECTIONS["LEFT"]
         if keys[pygame.K_RIGHT]:
-            self.direction = DIRECTIONS["RIGHT"]
+            self.next_direction = DIRECTIONS["RIGHT"]
         if keys[pygame.K_UP]:
-            self.direction = DIRECTIONS["UP"]
+            self.next_direction = DIRECTIONS["UP"]
         if keys[pygame.K_DOWN]:
-            self.direction = DIRECTIONS["DOWN"]
+            self.next_direction = DIRECTIONS["DOWN"]
+
+        # Try to change direction if centered on a tile
+        if self.is_centered() and self.next_direction != self.direction:
+            if not maze.check_collision(self.x, self.y, self.next_direction):
+                self.direction = self.next_direction
+
+        # Calculate new position based on current direction
+        new_x = self.x
+        new_y = self.y
         
         if self.direction == DIRECTIONS["LEFT"]:
             new_x -= self.speed
@@ -47,7 +59,7 @@ class Player:
             new_y += self.speed
             self.angle = 270
 
-
+        # Move if no collision in current direction
         if not maze.check_collision(self.x, self.y, self.direction):
             self.x = new_x
             self.y = new_y
@@ -80,4 +92,6 @@ class Player:
         self.x = x
         self.y = y
         self.angle = 0
+        self.direction = DIRECTIONS["RIGHT"]
+        self.next_direction = DIRECTIONS["RIGHT"]
         self.score = 0
