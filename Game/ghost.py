@@ -25,8 +25,7 @@ class Ghost:
     def get_possible_directions(self, maze):
         possible = []
         for direction in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]:
-            if self.can_move_in_direction(direction, maze):
-                possible.append(direction)
+            if self.can_move_in_direction(direction, maze): possible.append(direction)
         return possible
     
     def choose_direction(self, maze, target_pos):
@@ -35,13 +34,11 @@ class Ghost:
             # try not to reverse direction unless it's the only option
             if len(possible_directions) > 1 and self.direction != Vector2(0, 0):
                 opposite = self.direction * -1
-                if opposite in possible_directions:
-                    possible_directions.remove(opposite)
+                if opposite in possible_directions: possible_directions.remove(opposite)
             return random.choice(possible_directions)
         else:
             possible_directions = self.get_possible_directions(maze)
-            if not possible_directions:
-                return Vector2(0, 0)
+            if not possible_directions: return Vector2(0, 0)
             
             target_position = target_pos.position if hasattr(target_pos, 'position') else target_pos
             
@@ -51,10 +48,8 @@ class Ghost:
                 distance = (next_pos - target_position).length()
                 distances.append((distance, direction))
             
-            if self.state == GhostState.EATEN:
-                return min(distances, key=lambda x: x[0])[1]
-            else:
-                return min(distances, key=lambda x: x[0])[1]
+            if self.state == GhostState.EATEN: return min(distances, key=lambda x: x[0])[1]
+            else: return min(distances, key=lambda x: x[0])[1]
     
     def can_move_in_direction(self, direction, maze):
         next_tile_pos = self.position + direction * maze.tile_size
@@ -72,8 +67,7 @@ class Ghost:
     def update(self, maze, target_pos):
         if self.state == GhostState.FRIGHTENED:
             self.frightened_timer -= 1
-            if self.frightened_timer <= 0:
-                self.state = GhostState.CHASE
+            if self.frightened_timer <= 0: self.state = GhostState.CHASE
         
         if self.is_at_center(maze):
             new_direction = self.choose_direction(maze, target_pos)
@@ -86,10 +80,8 @@ class Ghost:
         
         if self.direction:
             new_pos = self.position + self.direction * self.speed
-            if not maze.is_wall(new_pos.x, new_pos.y):
-                self.position = new_pos
-            else:
-                self.direction = self.choose_direction(maze, target_pos)
+            if not maze.is_wall(new_pos.x, new_pos.y): self.position = new_pos
+            else: self.direction = self.choose_direction(maze, target_pos)
     
     def draw(self, screen):
         current_color = self.color

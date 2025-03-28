@@ -17,14 +17,10 @@ class Player:
         
     def handle_input(self, event):
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                self.next_direction = Vector2(-1, 0)
-            elif event.key == pygame.K_RIGHT:
-                self.next_direction = Vector2(1, 0)
-            elif event.key == pygame.K_UP:
-                self.next_direction = Vector2(0, -1)
-            elif event.key == pygame.K_DOWN:
-                self.next_direction = Vector2(0, 1)
+            if event.key == pygame.K_LEFT: self.next_direction = Vector2(-1, 0)
+            elif event.key == pygame.K_RIGHT: self.next_direction = Vector2(1, 0)
+            elif event.key == pygame.K_UP: self.next_direction = Vector2(0, -1)
+            elif event.key == pygame.K_DOWN: self.next_direction = Vector2(0, 1)
     
     def can_move_in_direction(self, direction, maze):
         next_tile_pos = self.position + direction * maze.tile_size
@@ -32,8 +28,7 @@ class Player:
     
     def is_at_center(self, maze):
         center_x, center_y = maze.get_tile_center(self.position.x, self.position.y)
-        return (abs(self.position.x - center_x) < self.speed and 
-                abs(self.position.y - center_y) < self.speed)
+        return (abs(self.position.x - center_x) < self.speed and abs(self.position.y - center_y) < self.speed)
 
     def update(self, maze):
         if self.next_direction and self.is_at_center(maze):
@@ -53,17 +48,14 @@ class Player:
                 self.position.y = center_y
             else:
                 new_pos = self.position + self.direction * self.speed
-                if not maze.is_wall(new_pos.x, new_pos.y):
-                    self.position = new_pos
+                if not maze.is_wall(new_pos.x, new_pos.y): self.position = new_pos
         
         # Update mouth animation
         self.animation_timer += self.animation_speed
-        if self.animation_timer > 1:
-            self.animation_timer = 0
+        if self.animation_timer > 1: self.animation_timer = 0
             
         eaten, power = maze.eat_dot(self.position.x, self.position.y)
-        if eaten:
-            self.score += 10 if not power else 50
+        if eaten: self.score += 10 if not power else 50
         return power
     
     def draw(self, screen):
