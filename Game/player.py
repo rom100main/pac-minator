@@ -9,8 +9,8 @@ class Player:
         self.next_direction = Vector2(0, 0)
         self.speed = 2
         self.radius = 13
-        self.color = (255, 255, 0)  # Yellow
-        self.mouth_angle = 45  # Degrees for mouth opening
+        self.color = (255, 255, 0)  # yellow
+        self.mouth_angle = 45
         self.animation_timer = 0
         self.animation_speed = 0.15
         self.score = 0
@@ -27,7 +27,6 @@ class Player:
                 self.next_direction = Vector2(0, 1)
     
     def can_move_in_direction(self, direction, maze):
-        # Check if we can move in the given direction from current position
         next_tile_pos = self.position + direction * maze.tile_size
         return not maze.is_wall(next_tile_pos.x, next_tile_pos.y)
     
@@ -37,18 +36,15 @@ class Player:
                 abs(self.position.y - center_y) < self.speed)
 
     def update(self, maze):
-        # Try to execute stored turn if at tile center
         if self.next_direction and self.is_at_center(maze):
-            # Check if we can move in the stored direction
             if self.can_move_in_direction(self.next_direction, maze):
                 self.direction = self.next_direction
                 # Snap to grid when turning
                 center_x, center_y = maze.get_tile_center(self.position.x, self.position.y)
                 self.position.x = center_x
                 self.position.y = center_y
-                self.next_direction = Vector2(0, 0)  # Clear the stored direction after executing
+                self.next_direction = Vector2(0, 0)
         
-        # Continue moving in current direction if possible
         if self.direction:
             if not self.can_move_in_direction(self.direction, maze) and self.is_at_center(maze):
                 # Stop at center if we can't move forward
@@ -56,7 +52,6 @@ class Player:
                 self.position.x = center_x
                 self.position.y = center_y
             else:
-                # Continue moving
                 new_pos = self.position + self.direction * self.speed
                 if not maze.is_wall(new_pos.x, new_pos.y):
                     self.position = new_pos
@@ -66,31 +61,22 @@ class Player:
         if self.animation_timer > 1:
             self.animation_timer = 0
             
-        # Check for dot collision
         eaten, power = maze.eat_dot(self.position.x, self.position.y)
         if eaten:
             self.score += 10 if not power else 50
         return power
     
     def draw(self, screen):
-        # Calculate mouth opening based on animation timer
         current_angle = self.mouth_angle * abs(math.sin(self.animation_timer * math.pi))
         
-        # Calculate rotation angle based on direction
         rotation = 0
-        if self.direction.x < 0:
-            rotation = 180
-        elif self.direction.x > 0:
-            rotation = 0
-        elif self.direction.y < 0:
-            rotation = 90
-        elif self.direction.y > 0:
-            rotation = 270
+        if self.direction.x < 0: rotation = 180
+        elif self.direction.x > 0: rotation = 0
+        elif self.direction.y < 0: rotation = 90
+        elif self.direction.y > 0: rotation = 270
             
-        # Draw Pac-Man body
         pygame.draw.circle(screen, self.color, (int(self.position.x), int(self.position.y)), self.radius)
         
-        # Draw mouth
         mouth_points = [
             self.position,
             self.position + Vector2(self.radius, 0).rotate(current_angle - rotation),
