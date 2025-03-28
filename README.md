@@ -2,7 +2,9 @@
 
 ## Description
 
-Pac minator is a Python implementation where Pac-Man turns the tables on the ghosts! Using artificial intelligence, our yellow hero becomes superintelligent and hunts down the spectral enemies. This unique twist on the classic arcade game showcases advanced AI algorithms in action.
+Pac minator is a Python implementation where Pac-Man turns the tables on the ghosts! 
+Using artificial intelligence, our yellow hero becomes superintelligent. He will eat all fruits and avoid the ghosts flawlessly.
+This unique twist on the classic arcade game showcases advanced AI algorithms in action.
 
 ## Installation
 
