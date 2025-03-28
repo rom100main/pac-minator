@@ -44,14 +44,7 @@ class Game:
         self.running = True
         self.game_over = False
         self.font = pygame.font.Font(None, 36)
-    
-    def handle_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT: self.running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE: self.running = False
-                else: self.player.handle_input(event)
-    
+ 
     def check_collisions(self):
         for ghost in self.ghosts:
             distance = (ghost.position - self.player.position).length()
@@ -59,6 +52,13 @@ class Game:
                 if ghost.state == ghost.state.FRIGHTENED: ghost.state = ghost.state.EATEN
                 elif ghost.state == ghost.state.CHASE: self.game_over = True
     
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: self.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE: self.running = False
+                else: self.player.handle_input(event)
+
     def update(self):
         if self.game_over:
             return

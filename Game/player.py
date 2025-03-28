@@ -1,5 +1,6 @@
 import pygame
 from pygame.math import Vector2
+import numpy as np
 import math
 
 class Player:
@@ -14,13 +15,10 @@ class Player:
         self.animation_timer = 0
         self.animation_speed = 0.15
         self.score = 0
-        
-    def handle_input(self, event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT: self.next_direction = Vector2(-1, 0)
-            elif event.key == pygame.K_RIGHT: self.next_direction = Vector2(1, 0)
-            elif event.key == pygame.K_UP: self.next_direction = Vector2(0, -1)
-            elif event.key == pygame.K_DOWN: self.next_direction = Vector2(0, 1)
+
+    def get_grid_position(self): return int(self.position.x // 16), int(self.position.y // 16)
+    
+    def get_grid_next_position(self): return int((self.position.x + self.direction.x * self.speed) // 16), int((self.position.y + self.direction.y * self.speed) // 16)
     
     def can_move_in_direction(self, direction, maze):
         next_tile_pos = self.position + direction * maze.tile_size
@@ -29,6 +27,13 @@ class Player:
     def is_at_center(self, maze):
         center_x, center_y = maze.get_tile_center(self.position.x, self.position.y)
         return (abs(self.position.x - center_x) < self.speed and abs(self.position.y - center_y) < self.speed)
+
+    def handle_input(self, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT: self.next_direction = Vector2(-1, 0)
+            elif event.key == pygame.K_RIGHT: self.next_direction = Vector2(1, 0)
+            elif event.key == pygame.K_UP: self.next_direction = Vector2(0, -1)
+            elif event.key == pygame.K_DOWN: self.next_direction = Vector2(0, 1)
 
     def update(self, maze):
         if self.next_direction and self.is_at_center(maze):

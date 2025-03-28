@@ -21,7 +21,11 @@ class Ghost:
         self.eaten_color = (255, 255, 255)  # white
         self.frightened_timer = 0
         self.frightened_duration = 500  # duration update cycles
+
+    def get_grid_position(self): return int(self.position.x // 16), int(self.position.y // 16)
     
+    def get_grid_next_position(self): return int((self.position.x + self.direction.x * self.speed) // 16), int((self.position.y + self.direction.y * self.speed) // 16)
+
     def get_possible_directions(self, maze):
         possible = []
         for direction in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]:
