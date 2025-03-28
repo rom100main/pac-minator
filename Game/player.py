@@ -9,7 +9,7 @@ class Player:
         self.next_direction = Vector2(0, 0)
         self.speed = 2
         self.radius = 13
-        self.color = (255, 255, 0)  # yellow
+        self.color = (255, 255, 0) # yellow
         self.mouth_angle = 45
         self.animation_timer = 0
         self.animation_speed = 0.15
@@ -34,7 +34,7 @@ class Player:
         if self.next_direction and self.is_at_center(maze):
             if self.can_move_in_direction(self.next_direction, maze):
                 self.direction = self.next_direction
-                # Snap to grid when turning
+                # snap to grid when turning
                 center_x, center_y = maze.get_tile_center(self.position.x, self.position.y)
                 self.position.x = center_x
                 self.position.y = center_y
@@ -42,7 +42,7 @@ class Player:
         
         if self.direction:
             if not self.can_move_in_direction(self.direction, maze) and self.is_at_center(maze):
-                # Stop at center if we can't move forward
+                # stop at center if we can't move forward
                 center_x, center_y = maze.get_tile_center(self.position.x, self.position.y)
                 self.position.x = center_x
                 self.position.y = center_y
@@ -50,7 +50,7 @@ class Player:
                 new_pos = self.position + self.direction * self.speed
                 if not maze.is_wall(new_pos.x, new_pos.y): self.position = new_pos
         
-        # Update mouth animation
+        # update mouth animation
         self.animation_timer += self.animation_speed
         if self.animation_timer > 1: self.animation_timer = 0
             
