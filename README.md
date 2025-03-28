@@ -34,5 +34,5 @@ pip install -r requirements.txt
 
 Run the game
 ```bash
-python Game/main.py
+python game
 ```
