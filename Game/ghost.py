@@ -2,7 +2,6 @@ import pygame
 from pygame.math import Vector2
 import random
 from enum import Enum
-import math
 
 class GhostState(Enum):
     CHASE = 1
