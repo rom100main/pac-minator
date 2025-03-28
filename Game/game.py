@@ -1,4 +1,6 @@
 import pygame
+import numpy as np
+
 from maze import Maze
 from player import Player
 from ghost import Ghost
@@ -45,6 +47,32 @@ class Game:
         self.game_over = False
         self.font = pygame.font.Font(None, 36)
  
+    def get_grid_player(self):
+        position = np.zeros(self.maze.grid.shape)
+        pos_x, pos_y = self.maze.convert_to_grid(*self.player.position)
+        position[pos_y, pos_x] = 1
+
+        next_position = np.zeros(self.maze.grid.shape)
+        next_pos_x, next_pos_y = self.player.position + self.player.direction * self.player.speed
+        next_pos_x, next_pos_y = self.maze.convert_to_grid(next_pos_x, next_pos_y)
+        next_position[next_pos_y, next_pos_x] = 1
+        
+        return position, next_position
+    
+    def get_grid_ghosts(self):
+        positions = np.zeros(self.maze.grid.shape)
+        for ghost in self.ghosts:
+            pos_x, pos_y = self.maze.convert_to_grid(*ghost.position)
+            positions[pos_y, pos_x] = 1
+        
+        next_positions = np.zeros(self.maze.grid.shape)
+        for ghost in self.ghosts:
+            next_pos_x, next_pos_y = ghost.position + ghost.direction * ghost.speed
+            next_pos_x, next_pos_y = self.maze.convert_to_grid(next_pos_x, next_pos_y)
+            next_positions[next_pos_y, next_pos_x] = 1
+        
+        return positions, next_positions
+
     def check_collisions(self):
         for ghost in self.ghosts:
             distance = (ghost.position - self.player.position).length()
@@ -60,8 +88,7 @@ class Game:
                 else: self.player.handle_input(event)
 
     def update(self):
-        if self.game_over:
-            return
+        if self.game_over: return
         
         power_pellet = self.player.update(self.maze)
         if power_pellet:

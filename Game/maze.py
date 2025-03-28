@@ -35,13 +35,6 @@ class Maze:
         self.WALL_COLOR = (0, 0, 255) # blue
         self.DOT_COLOR = (255, 255, 255) # white
         self.POWER_PELLET_COLOR = (255, 255, 0) # yellow
-        
-    def is_wall(self, x, y):
-        grid_x = int(x // self.tile_size)
-        grid_y = int(y // self.tile_size)
-        
-        if 0 <= grid_x < self.width and 0 <= grid_y < self.height: return self.grid[grid_y][grid_x] == 1
-        return True
     
     def get_tile_center(self, x, y):
         grid_x = int(x // self.tile_size)
@@ -54,7 +47,16 @@ class Maze:
         
         if 0 <= grid_x < self.width and 0 <= grid_y < self.height: return self.grid[grid_y][grid_x]
         return 1
+
+    def convert_to_grid(self, x, y): return int(x // self.tile_size), int(y // self.tile_size)
     
+    def is_wall(self, x, y):
+        grid_x = int(x // self.tile_size)
+        grid_y = int(y // self.tile_size)
+        
+        if 0 <= grid_x < self.width and 0 <= grid_y < self.height: return self.grid[grid_y][grid_x] == 1
+        return True
+
     def eat_dot(self, x, y):
         grid_x = int(x // self.tile_size)
         grid_y = int(y // self.tile_size)

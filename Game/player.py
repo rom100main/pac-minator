@@ -1,6 +1,5 @@
 import pygame
 from pygame.math import Vector2
-import numpy as np
 import math
 
 class Player:
@@ -16,10 +15,6 @@ class Player:
         self.animation_speed = 0.15
         self.score = 0
 
-    def get_grid_position(self): return int(self.position.x // 16), int(self.position.y // 16)
-    
-    def get_grid_next_position(self): return int((self.position.x + self.direction.x * self.speed) // 16), int((self.position.y + self.direction.y * self.speed) // 16)
-    
     def can_move_in_direction(self, direction, maze):
         next_tile_pos = self.position + direction * maze.tile_size
         return not maze.is_wall(next_tile_pos.x, next_tile_pos.y)
