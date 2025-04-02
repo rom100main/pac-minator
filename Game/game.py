@@ -3,7 +3,7 @@ import numpy as np
 
 from maze import Maze
 from player import Player
-from ghost import Ghost
+from ghost import Ghost, GhostType
 
 
 class Button:
@@ -67,33 +67,42 @@ class Game:
         player_start_y = self.maze.tile_size * 15 + self.maze.tile_size // 2
         self.player = Player(player_start_x, player_start_y)
         
-        # Setup ghosts
-        self.ghosts = [
-            Ghost( # red ghost
-                self.maze.tile_size * 9 + self.maze.tile_size // 2,
-                self.maze.tile_size * 7 + self.maze.tile_size // 2,
-                (255, 0, 0)
-            ),
-            Ghost( # pink ghost
-                self.maze.tile_size * 8 + self.maze.tile_size // 2,
-                self.maze.tile_size * 7 + self.maze.tile_size // 2,
-                (255, 182, 255)
-            ),
-            Ghost( # cyan ghost
-                self.maze.tile_size * 10 + self.maze.tile_size // 2,
-                self.maze.tile_size * 7 + self.maze.tile_size // 2,
-                (0, 255, 255)
-            ),
-            Ghost( # orange ghost
-                self.maze.tile_size * 9 + self.maze.tile_size // 2,
-                self.maze.tile_size * 7 + self.maze.tile_size // 2,
-                (255, 182, 85)
-            )
+        # Setup ghosts with their new ghost types
+        ghost_start_positions = [
+            # Blinky (red) - starts outside
+            (self.maze.tile_size * 9 + self.maze.tile_size // 2,
+             self.maze.tile_size * 7 + self.maze.tile_size // 2,
+             (255, 0, 0),
+             GhostType.BLINKY),
+            # Pinky (pink) - starts outside
+            (self.maze.tile_size * 8 + self.maze.tile_size // 2,
+             self.maze.tile_size * 7 + self.maze.tile_size // 2,
+             (255, 182, 255),
+             GhostType.PINKY),
+            # Inky (cyan) - starts outside
+            (self.maze.tile_size * 10 + self.maze.tile_size // 2,
+             self.maze.tile_size * 7 + self.maze.tile_size // 2,
+             (0, 255, 255),
+             GhostType.INKY),
+            # Clyde (orange) - starts outside
+            (self.maze.tile_size * 9 + self.maze.tile_size // 2,
+             self.maze.tile_size * 7 + self.maze.tile_size // 2,
+             (255, 182, 85),
+             GhostType.CLYDE)
         ]
+        
+        self.ghosts = []
+        for x, y, color, ghost_type in ghost_start_positions:
+            self.ghosts.append(Ghost(x, y, color, ghost_type))
+        
+        # Add ghosts attribute to player for Inky's targeting
+        self.player.ghosts = self.ghosts
         
         # Game state
         self.running = True
         self.game_over = False
+        self.win = False
+        self.level = 1
 
     def reset_game(self):
         # Reset maze (recreate dots/pellets)
@@ -132,8 +141,20 @@ class Game:
         for ghost in self.ghosts:
             distance = (ghost.position - self.player.position).length()
             if distance < (ghost.radius + self.player.radius):
-                if ghost.state == ghost.state.FRIGHTENED: ghost.state = ghost.state.EATEN
-                elif ghost.state == ghost.state.CHASE: self.game_over = True
+                if ghost.state == ghost.state.FRIGHTENED:
+                    ghost.enter_eaten_mode()
+                    # Score for eating ghost increases with each ghost eaten
+                    # Count how many ghosts are in eaten state
+                    eaten_count = sum(1 for g in self.ghosts if g.state == g.state.EATEN)
+                    points = 200 * (2 ** (eaten_count - 1))  # 200, 400, 800, 1600
+                    self.player.score += points
+                elif ghost.state == ghost.state.CHASE or ghost.state == ghost.state.SCATTER:
+                    self.game_over = True
+        
+        # Check win condition
+        if self.maze.count_dots() == 0:
+            self.win = True
+            self.game_over = True
     
     def handle_events(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -175,11 +196,23 @@ class Game:
         
         self.player.draw(self.screen)
         
+        # Draw score
         score_text = self.font.render(f"Score: {self.player.score}", True, (255, 255, 255))
         self.screen.blit(score_text, (10, 10))
         
+        # Draw level
+        level_text = self.font.render(f"Level: {self.level}", True, (255, 255, 255))
+        level_rect = level_text.get_rect()
+        level_rect.right = self.maze.screen_width - 10
+        level_rect.top = 10
+        self.screen.blit(level_text, level_rect)
+        
         if self.game_over:
-            game_over_text = self.font.render("Game Over!", True, (255, 0, 0))
+            if self.win:
+                game_over_text = self.font.render("You Win!", True, (0, 255, 0))
+            else:
+                game_over_text = self.font.render("Game Over!", True, (255, 0, 0))
+                
             text_rect = game_over_text.get_rect(center=(self.maze.screen_width // 2, self.maze.screen_height // 2))
             self.screen.blit(game_over_text, text_rect)
             
