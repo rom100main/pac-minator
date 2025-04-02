@@ -35,6 +35,9 @@ class Maze:
         self.WALL_COLOR = (0, 0, 255) # blue
         self.DOT_COLOR = (255, 255, 255) # white
         self.POWER_PELLET_COLOR = (255, 255, 0) # yellow
+
+        # Sauvegarde de la grille initiale dès la création
+        self.save_initial_grid()
     
     def get_tile_center(self, x, y):
         grid_x = int(x // self.tile_size)
@@ -67,6 +70,20 @@ class Maze:
                 self.grid[grid_y][grid_x] = 0
                 return True, is_power_pellet
         return False, False
+    
+    def save_initial_grid(self):
+        """Sauvegarde la grille initiale pour pouvoir la restaurer plus tard."""
+        self.initial_grid = np.copy(self.grid)
+
+    def reset(self):
+        """Réinitialise la grille à son état initial."""
+        self.grid = np.copy(self.initial_grid)
+
+    def count_dots(self):
+        """Compte le nombre de dots et power pellets restants."""
+        dots_count = np.sum(self.grid == 2)
+        power_pellets_count = np.sum(self.grid == 3)
+        return dots_count + power_pellets_count
     
     def draw(self, screen):
         for y in range(self.height):

@@ -5,6 +5,35 @@ from maze import Maze
 from player import Player
 from ghost import Ghost
 
+
+class Button:
+    def __init__(self, x, y, width, height, text, color, hover_color, text_color):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.text = text
+        self.color = color
+        self.hover_color = hover_color
+        self.text_color = text_color
+        self.is_hovered = False
+    
+    def draw(self, screen, font):
+        current_color = self.hover_color if self.is_hovered else self.color
+        
+        # Draw the button rectangle
+        pygame.draw.rect(screen, current_color, self.rect, border_radius=12)
+        pygame.draw.rect(screen, (255, 255, 255), self.rect, width=2, border_radius=12)
+        
+        # Draw the text
+        text_surf = font.render(self.text, True, self.text_color)
+        text_rect = text_surf.get_rect(center=self.rect.center)
+        screen.blit(text_surf, text_rect)
+    
+    def check_hover(self, mouse_pos):
+        self.is_hovered = self.rect.collidepoint(mouse_pos)
+        return self.is_hovered
+    
+    def clicked(self, mouse_pos):
+        return self.rect.collidepoint(mouse_pos)
+
 class Game:
     def __init__(self):
         pygame.init()
@@ -16,10 +45,29 @@ class Game:
         self.clock = pygame.time.Clock()
         self.fps = 50
         
+        # Initialize game elements
+        self.initialize_game()
+        
+        # Font setup
+        self.font = pygame.font.Font(None, 36)
+        self.button_font = pygame.font.Font(None, 28)
+        
+        # Button setup
+        button_width, button_height = 150, 50
+        button_x = (self.maze.screen_width - button_width) // 2
+        button_y = self.maze.screen_height // 2 + 50
+        self.restart_button = Button(
+            button_x, button_y, button_width, button_height,
+            "Play again", (200, 0, 0), (250, 0, 0), (255, 255, 255)
+        )
+    
+    def initialize_game(self):
+        # Setup player
         player_start_x = self.maze.tile_size * 9 + self.maze.tile_size // 2
         player_start_y = self.maze.tile_size * 15 + self.maze.tile_size // 2
         self.player = Player(player_start_x, player_start_y)
         
+        # Setup ghosts
         self.ghosts = [
             Ghost( # red ghost
                 self.maze.tile_size * 9 + self.maze.tile_size // 2,
@@ -43,9 +91,16 @@ class Game:
             )
         ]
         
+        # Game state
         self.running = True
         self.game_over = False
-        self.font = pygame.font.Font(None, 36)
+
+    def reset_game(self):
+        # Reset maze (recreate dots/pellets)
+        self.maze.reset()
+        
+        # Reset player and ghosts
+        self.initialize_game()
  
     def get_grid_player(self):
         position = np.zeros(self.maze.grid.shape)
@@ -81,11 +136,23 @@ class Game:
                 elif ghost.state == ghost.state.CHASE: self.game_over = True
     
     def handle_events(self):
+        mouse_pos = pygame.mouse.get_pos()
+        
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: self.running = False
+            if event.type == pygame.QUIT:
+                self.running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE: self.running = False
-                else: self.player.handle_input(event)
+                if event.key == pygame.K_ESCAPE:
+                    self.running = False
+                else:
+                    self.player.handle_input(event)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if self.game_over and self.restart_button.clicked(mouse_pos):
+                    self.reset_game()
+        
+        # Check hover for button visual effect
+        if self.game_over:
+            self.restart_button.check_hover(mouse_pos)
 
     def update(self):
         if self.game_over: return
@@ -103,7 +170,8 @@ class Game:
 
         self.maze.draw(self.screen)
         
-        for ghost in self.ghosts: ghost.draw(self.screen)
+        for ghost in self.ghosts:
+            ghost.draw(self.screen)
         
         self.player.draw(self.screen)
         
@@ -114,6 +182,9 @@ class Game:
             game_over_text = self.font.render("Game Over!", True, (255, 0, 0))
             text_rect = game_over_text.get_rect(center=(self.maze.screen_width // 2, self.maze.screen_height // 2))
             self.screen.blit(game_over_text, text_rect)
+            
+            # Draw restart button
+            self.restart_button.draw(self.screen, self.button_font)
         
         pygame.display.flip()
     

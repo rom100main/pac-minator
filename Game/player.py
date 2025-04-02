@@ -25,10 +25,10 @@ class Player:
 
     def handle_input(self, event):
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT: self.next_direction = Vector2(-1, 0)
-            elif event.key == pygame.K_RIGHT: self.next_direction = Vector2(1, 0)
-            elif event.key == pygame.K_UP: self.next_direction = Vector2(0, -1)
-            elif event.key == pygame.K_DOWN: self.next_direction = Vector2(0, 1)
+            if event.key in [pygame.K_LEFT, pygame.K_q] : self.next_direction = Vector2(-1, 0)
+            elif event.key in [pygame.K_RIGHT, pygame.K_d]: self.next_direction = Vector2(1, 0)
+            elif event.key in [pygame.K_UP, pygame.K_z]: self.next_direction = Vector2(0, -1)
+            elif event.key in [pygame.K_DOWN, pygame.K_s]: self.next_direction = Vector2(0, 1)
 
     def update(self, maze):
         if self.next_direction and self.is_at_center(maze):
