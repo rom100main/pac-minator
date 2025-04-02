@@ -17,7 +17,7 @@ class Player:
         self.max_mouth_angle = 45  # maximum mouth opening
         self.mouth_angle = self.max_mouth_angle
         self.animation_timer = 0
-        self.animation_speed = 0.1
+        self.animation_speed = 0.5
         
         # Death animation
         self.is_dying = False
@@ -99,7 +99,7 @@ class Player:
         if eaten: 
             self.score += 10 if not power else 50
             # Speed up mouth animation briefly when eating
-            self.animation_speed = 0.2
+            self.animation_speed = 0.5
             pygame.time.set_timer(pygame.USEREVENT + 1, 250)  # Reset animation speed after delay
             
         if power:
