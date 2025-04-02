@@ -42,6 +42,13 @@ class Ghost:
         self.mode_durations = [(self.scatter_duration, GhostState.SCATTER), 
                               (self.chase_duration, GhostState.CHASE)]
         self.mode_index = 0
+
+         # Add variables to detect stuck ghosts
+        self.last_position = Vector2(x, y)
+        self.stuck_timer = 0
+        self.stuck_threshold = 10  # If not moved for 10 frames, ghost is considered stuck
+        self.override_direction = None
+        self.override_timer = 0
         
     def _get_home_corner(self, ghost_type):
         # Define scatter corners for each ghost
@@ -64,6 +71,14 @@ class Ghost:
     
     def choose_direction(self, maze, player):
         possible_directions = self.get_possible_directions(maze)
+        
+        # If we have an override direction from being stuck, use it
+        if self.override_direction and self.override_direction in possible_directions:
+            if self.override_timer > 0:
+                self.override_timer -= 1
+                return self.override_direction
+            else:
+                self.override_direction = None
         
         # Remove reverse direction unless it's the only option
         if len(possible_directions) > 1 and self.direction != Vector2(0, 0):
@@ -222,12 +237,29 @@ class Ghost:
         if self.reached_home():
             self.revive()
         
+        # Check for stuck ghosts (haven't moved significantly)
+        distance_moved = (self.position - self.last_position).length()
+        if distance_moved < 0.5:  # If barely moved
+            self.stuck_timer += 1
+            if self.stuck_timer >= self.stuck_threshold:
+                # Ghost is stuck, choose a random direction to escape
+                possible = self.get_possible_directions(maze)
+                if possible:
+                    self.override_direction = random.choice(possible)
+                    self.override_timer = 10  # Use this direction for next 10 frames
+                    self.stuck_timer = 0
+        else:
+            self.stuck_timer = 0  # Reset stuck timer if moving
+        
+        # Save current position for next frame's comparison
+        self.last_position = Vector2(self.position)
+        
         # Movement logic
         if self.is_at_center(maze):
             new_direction = self.choose_direction(maze, player)
             if new_direction != Vector2(0, 0):
                 self.direction = new_direction
-                # Snap to grid when turning
+                # Snap to grid when turning to prevent getting stuck on walls
                 center_x, center_y = maze.get_tile_center(self.position.x, self.position.y)
                 self.position.x = center_x
                 self.position.y = center_y
@@ -237,9 +269,24 @@ class Ghost:
             if not maze.is_wall(new_pos.x, new_pos.y):
                 self.position = new_pos
             else:
-                # Redirect if we hit a wall
-                self.direction = self.choose_direction(maze, player)
-    
+                # Try to unstick from wall if needed
+                self.unstick_from_wall(maze, player)
+                
+    def unstick_from_wall(self, maze, player):
+        """Attempt to recover from being stuck against a wall"""
+        # First try: snap to grid and rechoose direction
+        center_x, center_y = maze.get_tile_center(self.position.x, self.position.y)
+        self.position.x = center_x
+        self.position.y = center_y
+        
+        # Force a random direction if we're in a tight spot
+        if self.stuck_timer > 5:
+            possible = self.get_possible_directions(maze)
+            if possible:
+                self.direction = random.choice(possible)
+        else:
+            self.direction = self.choose_direction(maze, player)
+
     def draw(self, screen):
         current_color = self.color
         if self.state == GhostState.FRIGHTENED:

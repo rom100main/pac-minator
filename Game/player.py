@@ -137,9 +137,6 @@ class Player:
         
         # Get pacman color - flash if power is ending
         color = self.color
-        if self.powered_up and self.power_timer > self.power_duration - self.power_flash_threshold:
-            if int(self.power_timer * 5) % 2 == 0:
-                color = (200, 200, 200)  # Flash to white-yellow
         
         # Draw the circle (body)
         pygame.draw.circle(screen, color, (int(self.position.x), int(self.position.y)), self.radius)
